@@ -36,7 +36,7 @@ version = "${project.name}-${project.mod_version}"
 group = project.maven_group
 
 def mappingsVersions = [
-//        11605: "1.16.5+build.10", // fixme 1.16.5 is not working due to java version drop to java 8
+       // 11605: "1.16.5+build.10", // fixme 1.16.5 is not working due to java version drop to java 8
         11701: "1.17.1+build.65",
         11800: "1.18+build.1",
         11802: "1.18.2+build.4",
@@ -51,7 +51,7 @@ def mappingsVersions = [
 ]
 
 def fabricApiVersions = [
-//        11605: "0.42.0+1.16", // fixme 1.16.5 is not working due to java version drop to java 8
+       // 11605: "0.42.0+1.16", // fixme 1.16.5 is not working due to java version drop to java 8
         11701: "0.46.1+1.17",
         11800: "0.44.0+1.18",
         11802: "0.77.0+1.18.2",
@@ -62,7 +62,7 @@ def fabricApiVersions = [
         12005: "0.97.8+1.20.5",
         12006: "0.100.0+1.20.6",
         12100: "0.100.7+1.21",
-        12101: "0.110.0+1.21.1",
+        12101: "0.110.0+1.21.1"
 ]
 
 

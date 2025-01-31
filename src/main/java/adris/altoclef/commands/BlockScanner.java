@@ -7,6 +7,7 @@ import adris.altoclef.eventbus.events.BlockPlaceEvent;
 import adris.altoclef.multiversion.blockpos.BlockPosVer;
 import adris.altoclef.trackers.blacklisting.WorldLocateBlacklist;
 import adris.altoclef.util.Dimension;
+import adris.altoclef.Settings;
 import adris.altoclef.util.helpers.BaritoneHelper;
 import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.time.TimerGame;
@@ -32,6 +33,7 @@ public class BlockScanner {
 
     private final AltoClef mod;
     private final TimerGame rescanTimer = new TimerGame(1);
+    private Settings settings;
 
     private final HashMap<Block, HashSet<BlockPos>> trackedBlocks = new HashMap<>();
     private final HashMap<Block, HashSet<BlockPos>> scannedBlocks = new HashMap<>();
@@ -75,8 +77,9 @@ public class BlockScanner {
     }
 
     //TODO replace four with config
+    //Done but idk if its the best way to do it
     public void requestBlockUnreachable(BlockPos pos) {
-        blacklist.blackListItem(mod, pos, 4);
+        blacklist.blackListItem(mod, pos, settings.getReachingBlockAttempts());
     }
 
 

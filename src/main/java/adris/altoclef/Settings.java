@@ -93,6 +93,11 @@ public class Settings implements IFailableConfigFile {
     private boolean showTimer = true;
 
     /**
+     * How many times the bot tries to reach a block
+     */
+    private int reachingBlockAttempts = 4;
+
+    /**
      * The delay between moving items for crafting/furnace/any kind of inventory movement.
      */
     private float containerItemMoveDelay = 0.2f;
@@ -477,6 +482,10 @@ public class Settings implements IFailableConfigFile {
 
     public boolean shouldShowTimer() {
         return showTimer;
+    }
+
+    public int getReachingBlockAttempts() {
+        return reachingBlockAttempts;
     }
 
     public float getResourcePickupRange() {
