@@ -198,6 +198,11 @@ public class Settings implements IFailableConfigFile {
     private boolean replantCrops = true;
 
     /**
+     * If set to true, will try to critical hit hostile mobs
+     */
+    private boolean allowCriticalHits = true;
+
+    /**
      * Uses killaura to move mobs away and performs survival moves including:
      * - Running away from hostile mobs when your health is low
      * - Run away from creepers about to blow up
@@ -506,6 +511,10 @@ public class Settings implements IFailableConfigFile {
 
     public boolean shouldUseCraftingBookToCraft() {
         return useCraftingBookToCraft;
+    }
+
+    public boolean allowCriticalHits() {
+        return allowCriticalHits;
     }
 
     public int getFoodUnitsToCollect() {

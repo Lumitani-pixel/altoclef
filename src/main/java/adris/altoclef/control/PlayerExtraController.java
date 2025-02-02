@@ -5,7 +5,6 @@ import adris.altoclef.eventbus.EventBus;
 import adris.altoclef.eventbus.events.BlockBreakingCancelEvent;
 import adris.altoclef.eventbus.events.BlockBreakingEvent;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 
 public class PlayerExtraController {
@@ -50,7 +49,6 @@ public class PlayerExtraController {
     public void attack(Entity entity) {
         if (inRange(entity)) {
             mod.getController().attackEntity(mod.getPlayer(), entity);
-            mod.getPlayer().swingHand(Hand.MAIN_HAND);
         }
     }
 }

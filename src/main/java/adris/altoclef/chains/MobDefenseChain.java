@@ -567,7 +567,8 @@ public class MobDefenseChain extends SingleTaskChain {
         return Optional.empty();
     }
 
-    private boolean isInDanger(AltoClef mod) {
+    //Why is this private??
+    public boolean isInDanger(AltoClef mod) {
         boolean witchNearby = mod.getEntityTracker().entityFound(WitchEntity.class);
 
         float health = mod.getPlayer().getHealth();

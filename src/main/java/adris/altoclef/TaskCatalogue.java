@@ -740,11 +740,6 @@ public class TaskCatalogue {
         return simple(name, new Item[]{matches}, getTask);
     }
 
-    // TODO: Do I really need this?
-    //private static CataloguedResource task(Item matches, Function<Integer, ResourceTask> getTask){
-    //
-    //}
-
     private static CataloguedResource mine(String name, MiningRequirement requirement, Item[] toMine, Item... targets) {
         Block[] toMineBlocks = new Block[toMine.length];
         for (int i = 0; i < toMine.length; ++i) toMineBlocks[i] = Block.getBlockFromItem(toMine[i]);

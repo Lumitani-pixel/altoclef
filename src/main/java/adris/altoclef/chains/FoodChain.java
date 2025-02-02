@@ -149,10 +149,9 @@ public class FoodChain extends SingleTaskChain {
             requestFillup = false;
         }
 
-        //FIXME should check if currently fighting
+        // Checks for the player being in Danger not if in combat
         if (hasFood && (needsToEat() || requestFillup) && cachedPerfectFood.isPresent() &&
-                !mod.getMLGBucketChain().isChorusFruiting() && !mod.getPlayer().isBlocking()/* &&
-                !areEnemiesNearby(mod)*/) {
+                !mod.getMLGBucketChain().isChorusFruiting() && !mod.getPlayer().isBlocking() && mod.getMobDefenseChain().isInDanger(mod)) {
 
             Item toUse = cachedPerfectFood.get();
 

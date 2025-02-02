@@ -186,7 +186,20 @@ public class KillAura {
                 canAttack = mod.getSlotHandler().forceDeequipHitTool();
             }
             if (canAttack) {
-                if (mod.getPlayer().isOnGround() || mod.getPlayer().getVelocity().getY() < 0 || mod.getPlayer().isTouchingWater()) {
+                if (mod.getModSettings().allowCriticalHits() && !mod.getPlayer().isTouchingWater()) {
+                    mod.getInputControls().hold(Input.JUMP);
+                    if (mod.getPlayer().getVelocity().getY() > 0) {
+
+                    }
+                    attackedLastTick = true;
+                    mod.getControllerExtras().attack(entity);
+                    mod.getInputControls().release(Input.JUMP);
+                }
+                else if (!mod.getModSettings().allowCriticalHits() &&
+                        mod.getPlayer().isOnGround() ||
+                        mod.getPlayer().getVelocity().getY() < 0 ||
+                        mod.getPlayer().isTouchingWater()) {
+
                     attackedLastTick = true;
                     mod.getControllerExtras().attack(entity);
                 }
