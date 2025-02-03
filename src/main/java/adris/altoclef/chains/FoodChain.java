@@ -149,7 +149,7 @@ public class FoodChain extends SingleTaskChain {
             requestFillup = false;
         }
 
-        // Checks for the player being in Danger not if in combat
+        // Checks for the player being in Danger
         if (hasFood && (needsToEat() || requestFillup) && cachedPerfectFood.isPresent() &&
                 !mod.getMLGBucketChain().isChorusFruiting() && !mod.getPlayer().isBlocking() && mod.getMobDefenseChain().isInDanger(mod)) {
 
