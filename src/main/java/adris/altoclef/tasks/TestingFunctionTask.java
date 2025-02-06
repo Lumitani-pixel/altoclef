@@ -26,10 +26,11 @@ public class TestingFunctionTask extends Task {
     private List<BlockPos> positions = null;
     private List<Direction> directions = null;
     private Direction.Axis axis = null;
+    private AltoClef mod;
 
     @Override
     protected void onStart() {
-        AltoClef.getInstance().getClientBaritone().getInputOverrideHandler().clearAllKeys();
+        mod.logWarning("This Command is not yet finished!!!");
         wait.reset();
     }
 
