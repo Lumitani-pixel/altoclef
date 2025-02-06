@@ -15,9 +15,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-//#if MC <= 12006
-//$$ import adris.altoclef.mixins.EntityAccessor;
-//#endif
 
 import java.util.ArrayList;
 import java.util.List;

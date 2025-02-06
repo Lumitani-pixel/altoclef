@@ -9,6 +9,7 @@ import adris.altoclef.util.helpers.StorageHelper;
 import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.slots.PlayerSlot;
 import adris.altoclef.util.slots.Slot;
+import adris.altoclef.util.time.TimerGame;
 import baritone.api.utils.input.Input;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.WitherEntity;
@@ -38,6 +39,7 @@ public class KillAura {
     private double forceFieldRange = Double.POSITIVE_INFINITY;
     private Entity forceHit = null;
     public boolean attackedLastTick = false;
+    private final TimerGame criticalTimer = new TimerGame(1.2);
 
     public static void equipWeapon(AltoClef mod) {
         List<ItemStack> invStacks = mod.getItemStorage().getItemStacksPlayerInventory(true);
@@ -188,12 +190,16 @@ public class KillAura {
             if (canAttack) {
                 if (mod.getModSettings().allowCriticalHits() && !mod.getPlayer().isTouchingWater()) {
                     mod.getInputControls().hold(Input.JUMP);
-                    if (mod.getPlayer().getVelocity().getY() > 0) {
-
+                    try {
+                        Thread.sleep(1200);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
-                    attackedLastTick = true;
-                    mod.getControllerExtras().attack(entity);
-                    mod.getInputControls().release(Input.JUMP);
+                    if (mod.getPlayer().getVelocity().getY() > 0) {
+                        attackedLastTick = true;
+                        mod.getControllerExtras().attack(entity);
+                        mod.getInputControls().release(Input.JUMP);
+                    }
                 }
                 else if (!mod.getModSettings().allowCriticalHits() &&
                         mod.getPlayer().isOnGround() ||
