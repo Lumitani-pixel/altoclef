@@ -202,7 +202,7 @@ public class ProjectileProtectionWallTask extends Task implements ITaskRequiresG
         if (blockPos == null) return false;
 
         // Check y level
-        if (!World.isValid(blockPos)) return false;
+        if (!World.isValid(blockPos) || !AltoClef.getInstance().getWorld().isInBuildLimit(blockPos)) return false;
 
         // Check if current block is replaceable
         if (!mod.getWorld().getBlockState(blockPos).isReplaceable()) return false;

@@ -84,7 +84,6 @@ public class AltoClef implements ModInitializer {
     private boolean paused = false;
     private Task storedTask;
 
-    //TODO refactor this later
     private static AltoClef instance;
 
     // Are we in game (playing in a server/world)
@@ -105,6 +104,10 @@ public class AltoClef implements ModInitializer {
         // However, some things (like resources) may still be uninitialized.
         // As such, nothing will be loaded here but basic initialization.
         EventBus.subscribe(TitleScreenEntryEvent.class, evt -> onInitializeLoad());
+
+        if (instance != null) {
+            throw new IllegalStateException("AltoClef already loaded!");
+        }
         instance = this;
     }
 

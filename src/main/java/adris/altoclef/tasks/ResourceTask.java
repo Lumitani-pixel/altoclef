@@ -68,7 +68,7 @@ public abstract class ResourceTask extends Task implements ITaskCanForce {
 
     @Override
     public boolean isFinished() {
-        return StorageHelper.itemTargetsMetInventoryNoCursor();
+        return StorageHelper.itemTargetsMetInventoryNoCursor(itemTargets);
     }
 
     @Override
