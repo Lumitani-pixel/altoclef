@@ -2,17 +2,19 @@ package adris.altoclef;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-// TODO: Debug library or use Minecraft's built in debugger
 public class Debug {
 
+    private static final Logger LOGGER = LogManager.getLogger("AltoClef");
     private static final int DEBUG_LOG_LEVEL = 0;
     private static final int WARN_LOG_LEVEL = 1;
     private static final int ERROR_LOG_LEVEL = 2;
 
     public static void logInternal(String message) {
         if (canLog(DEBUG_LOG_LEVEL)) {
-            System.out.println("ALTO CLEF: " + message);
+            LOGGER.debug(message);
         }
     }
 
@@ -50,18 +52,18 @@ public class Debug {
 
     public static void logWarning(String message) {
         if (canLog(WARN_LOG_LEVEL)) {
-            System.out.println("ALTO CLEF: WARNING: " + message);
+            LOGGER.warn(message);
         }
 
-        AltoClef altoClef = AltoClef.getInstance();
-        if (altoClef != null && !altoClef.getModSettings().shouldHideAllWarningLogs()) {
-            if (MinecraftClient.getInstance() != null && MinecraftClient.getInstance().player != null) {
+        // still show in Minecraft chat...
+        if (AltoClef.getInstance() != null && !AltoClef.getInstance().getModSettings().shouldHideAllWarningLogs()) {
+            if (MinecraftClient.getInstance().player != null) {
                 String msg = "\u00A72\u00A7l\u00A7o" + getLogPrefix() + "\u00A7c" + message + "\u00A7r";
                 MinecraftClient.getInstance().player.sendMessage(Text.of(msg), false);
-
             }
         }
     }
+
 
     public static void logWarning(String format, Object... args) {
         logWarning(String.format(format, args));
@@ -71,9 +73,7 @@ public class Debug {
         String stacktrace = getStack(2);
 
         if (canLog(ERROR_LOG_LEVEL)) {
-            System.err.println(message);
-            System.err.println("at:");
-            System.err.println(stacktrace);
+            LOGGER.error("{}\nat:\n{}", message, stacktrace);
         }
 
         if (MinecraftClient.getInstance() != null && MinecraftClient.getInstance().player != null) {
@@ -82,12 +82,15 @@ public class Debug {
         }
     }
 
+
     public static void logError(String format, Object... args) {
         logError(String.format(format, args));
     }
 
     public static void logStack() {
-        logInternal("STACKTRACE: \n" + getStack(2));
+        if (canLog(DEBUG_LOG_LEVEL)) {
+            LOGGER.debug("STACKTRACE:\n{}", getStack(2));
+        }
     }
 
     private static String getStack(int toSkip) {
