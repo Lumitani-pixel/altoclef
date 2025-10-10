@@ -249,7 +249,6 @@ public class KillAura {
             }
         }
 
-        // Begin shielding inputs
         input.hold(Input.SNEAK);
         input.hold(Input.CLICK_RIGHT);
     }
@@ -268,7 +267,6 @@ public class KillAura {
             targetSlot.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, SlotActionType.PICKUP));
         }
 
-        // Release all held inputs and resume automation
         input.release(Input.SNEAK);
         input.release(Input.CLICK_RIGHT);
         input.release(Input.JUMP);

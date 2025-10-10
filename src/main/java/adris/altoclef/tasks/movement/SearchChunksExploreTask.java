@@ -9,27 +9,33 @@ import adris.altoclef.tasksystem.Task;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * Searches/explores a continuous "blob" of chunks, attempting to load in ALL nearby chunks
- * that are part of this "blob" (e.g., biome, structure, etc.)
- * The subclass must define isChunkWithinSearchSpace to decide which chunks belong.
+ * Searches/explores a continuous "blob" of chunks, attempting to load in ALL nearby chunks that are part of this "blob"
+ * <p>
+ * You must define a function that determines whether a chunk is to be included within this "blob".
+ * <p>
+ * For instance, if you wish to explore an entire desert, this function will return whether a chunk is a desert chunk.
  */
 public abstract class SearchChunksExploreTask extends Task {
 
     private final Object searcherMutex = new Object();
     private final Set<ChunkPos> alreadyExplored = new HashSet<>();
-
     private ChunkSearchTask searcher;
-    private Subscription<ChunkLoadEvent> chunkLoadedSubscription;
+    private Subscription<ChunkLoadEvent> _chunkLoadedSubscription;
+
+    // Virtual
+    protected ChunkPos getBestChunkOverride(AltoClef mod, List<ChunkPos> chunks) {
+        return null;
+    }
 
     @Override
     protected void onStart() {
-        // Listen for new chunk loads
-        chunkLoadedSubscription = EventBus.subscribe(ChunkLoadEvent.class, evt -> {
-            if (evt.chunk != null) onChunkLoad(evt.chunk.getPos());
-        });
+        // Listen for chunk loading
+        _chunkLoadedSubscription = EventBus.subscribe(ChunkLoadEvent.class, evt -> onChunkLoad(evt.chunk.getPos()));
+
         resetSearch();
     }
 
@@ -37,73 +43,68 @@ public abstract class SearchChunksExploreTask extends Task {
     protected Task onTick() {
         synchronized (searcherMutex) {
             if (searcher == null) {
-                setDebugState("Exploring/Searching for valid chunk...");
+                setDebugState("Exploring/Searching for valid chunk");
+                // Explore
                 return getWanderTask();
             }
 
-            if (!searcher.isActive()) {
-                setDebugState("Searcher inactive, restarting...");
+            if (searcher.isActive() && searcher.isFinished()) {
+                Debug.logWarning("Target object search failed.");
                 alreadyExplored.addAll(searcher.getSearchedChunks());
                 searcher = null;
-                return getWanderTask();
-            }
-
-            if (searcher.isFinished() || searcher.finished()) {
-                Debug.logMessage("Searcher finished. Recording explored chunks.");
+            } else if (searcher.finished()) {
+                setDebugState("Searching for target object...");
+                Debug.logMessage("Search finished.");
                 alreadyExplored.addAll(searcher.getSearchedChunks());
                 searcher = null;
-                return getWanderTask();
             }
-
-            setDebugState("Searching within connected chunks...");
+            //Debug.logMessage("wtf: " + (_searcher == null? "(null)" :_searcher.finished()));
+            setDebugState("Searching within chunks...");
             return searcher;
         }
     }
 
     @Override
     protected void onStop(Task interruptTask) {
-        EventBus.unsubscribe(chunkLoadedSubscription);
-        if (searcher != null) searcher.stop(interruptTask);
+        EventBus.unsubscribe(_chunkLoadedSubscription);
     }
 
-    /** Called when a chunk loads — we may want to start a new search here. */
+    // When we find a valid chunk, start our search there.
     private void onChunkLoad(ChunkPos pos) {
-        if (!isActive()) return;
-        synchronized (searcherMutex) {
-            if (searcher != null) return;
-            if (alreadyExplored.contains(pos)) return;
+        if (searcher != null) return;
+        if (!this.isActive()) return;
 
-            if (isChunkWithinSearchSpace(AltoClef.getInstance(), pos)) {
-                Debug.logMessage("Starting new chunk searcher at: " + pos);
-                searcher = new SearchSubTask(pos);
+        if (isChunkWithinSearchSpace(AltoClef.getInstance(), pos)) {
+            synchronized (searcherMutex) {
+                if (!alreadyExplored.contains(pos)) {
+                    Debug.logMessage("New searcher: " + pos);
+                    searcher = new SearchSubTask(pos);
+                }
             }
         }
+
     }
 
     protected Task getWanderTask() {
         return new TimeoutWanderTask(true);
     }
 
-    /** Must be implemented: defines whether a given chunk belongs to this search blob. */
     protected abstract boolean isChunkWithinSearchSpace(AltoClef mod, ChunkPos pos);
 
-    /** Returns true if no active searcher is currently running. */
     public boolean failedSearch() {
         return searcher == null;
     }
 
-    /** Resets the current exploration state and restarts scanning from loaded chunks. */
     public void resetSearch() {
-        synchronized (searcherMutex) {
-            searcher = null;
-            alreadyExplored.clear();
-            for (ChunkPos start : AltoClef.getInstance().getChunkTracker().getLoadedChunks()) {
-                onChunkLoad(start);
-            }
+        //Debug.logMessage("Search reset");
+        searcher = null;
+        alreadyExplored.clear();
+        // We want to search the currently loaded chunks too!!!
+        for (ChunkPos start : AltoClef.getInstance().getChunkTracker().getLoadedChunks()) {
+            onChunkLoad(start);
         }
     }
 
-    /** Inner class that wraps a ChunkSearchTask customized for this explorer. */
     class SearchSubTask extends ChunkSearchTask {
 
         public SearchSubTask(ChunkPos start) {
@@ -115,17 +116,23 @@ public abstract class SearchChunksExploreTask extends Task {
             return isChunkWithinSearchSpace(mod, pos);
         }
 
-        // The scoring/ordering is handled by the new ChunkSearchTask, so no override needed.
+        @Override
+        public ChunkPos getBestChunk(AltoClef mod, List<ChunkPos> chunks) {
+            ChunkPos override = getBestChunkOverride(mod, chunks);
+            if (override != null) return override;
+            return super.getBestChunk(mod, chunks);
+        }
 
         @Override
         protected boolean isChunkSearchEqual(ChunkSearchTask other) {
-            // All searcher instances are treated as unique.
-            return other == this;
+            // Since we're keeping track of "_searcher", we expect the subchild routine to ALWAYS be consistent!
+            return other == this;//return other instanceof SearchSubTask;
         }
 
         @Override
         protected String toDebugString() {
-            return "Searching connected chunks...";
+            return "Searching chunks...";
         }
     }
+
 }
