@@ -1,8 +1,11 @@
 package adris.altoclef.control;
 
 import adris.altoclef.AltoClef;
+import adris.altoclef.chains.MLGBucketFallChain;
 import adris.altoclef.multiversion.versionedfields.Entities;
 import adris.altoclef.multiversion.item.ItemVer;
+import adris.altoclef.tasks.FastNetherPortalTask;
+import adris.altoclef.trackers.storage.ItemStorageTracker;
 import adris.altoclef.util.helpers.LookHelper;
 import adris.altoclef.util.helpers.StlHelper;
 import adris.altoclef.util.helpers.StorageHelper;
@@ -10,6 +13,7 @@ import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.slots.PlayerSlot;
 import adris.altoclef.util.slots.Slot;
 import baritone.api.utils.input.Input;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -24,9 +28,7 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Controls and applies killaura
@@ -78,32 +80,57 @@ public class KillAura {
 
     public void tickEnd(AltoClef mod) {
         Optional<Entity> entities = targets.stream().min(StlHelper.compareValues(entity -> entity.squaredDistanceTo(mod.getPlayer())));
-        if (entities.isPresent() &&
-                !mod.getEntityTracker().entityFound(PotionEntity.class) &&
-                (Double.isInfinite(forceFieldRange) || entities.get().squaredDistanceTo(mod.getPlayer()) < forceFieldRange * forceFieldRange ||
-                        entities.get().squaredDistanceTo(mod.getPlayer()) < 40) &&
-                !mod.getMLGBucketChain().isFalling(mod) && mod.getMLGBucketChain().doneMLG() &&
-                !mod.getMLGBucketChain().isChorusFruiting()) {
-            PlayerSlot offhandSlot = PlayerSlot.OFFHAND_SLOT;
-            Item offhandItem = StorageHelper.getItemStackInSlot(offhandSlot).getItem();
-            if (entities.get().getClass() != CreeperEntity.class && entities.get().getClass() != HoglinEntity.class &&
-                    entities.get().getClass() != ZoglinEntity.class && entities.get().getClass() != Entities.WARDEN &&
-                    entities.get().getClass() != WitherEntity.class
-                    && (mod.getItemStorage().hasItem(Items.SHIELD) || mod.getItemStorage().hasItemInOffhand(Items.SHIELD))
-                    && !mod.getPlayer().getItemCooldownManager().isCoolingDown(offhandItem)
-                    && mod.getClientBaritone().getPathingBehavior().isSafeToCancel()) {
-                LookHelper.lookAt(mod, entities.get().getEyePos());
-                ItemStack shieldSlot = StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT);
-                if (shieldSlot.getItem() != Items.SHIELD) {
-                    mod.getSlotHandler().forceEquipItemToOffhand(Items.SHIELD);
-                } else if (!WorldHelper.isSurroundedByHostiles()) {
-                    startShielding(mod);
-                }
-            }
-            performDelayedAttack(mod);
-        } else {
+        if (!entities.isPresent()) {
             stopShielding(mod);
+            return;
         }
+
+        Entity entity = entities.get();
+        MLGBucketFallChain mlgChain = mod.getMLGBucketChain();
+        ItemStorageTracker itemStorage = mod.getItemStorage();
+        Item offhandItem = StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem();
+        double distSq = entity.squaredDistanceTo(mod.getPlayer());
+
+        // Quick exits for performance and clarity
+        boolean inRange = Double.isInfinite(forceFieldRange)
+                || distSq < forceFieldRange * forceFieldRange
+                || distSq < 40;
+
+        if (mod.getEntityTracker().entityFound(PotionEntity.class)
+                || !inRange
+                || mlgChain.isFalling(mod)
+                || !mlgChain.doneMLG()
+                || mlgChain.isChorusFruiting()) {
+            stopShielding(mod);
+            return;
+        }
+
+        // Skip certain hostile entity types
+        Set<Class<?>> ignoredEntities = Set.of(
+                CreeperEntity.class,
+                HoglinEntity.class,
+                ZoglinEntity.class,
+                Entities.WARDEN,
+                WitherEntity.class
+        );
+
+        boolean shouldShield = !ignoredEntities.contains(entity.getClass())
+                && (itemStorage.hasItem(Items.SHIELD) || itemStorage.hasItemInOffhand(Items.SHIELD))
+                && !mod.getPlayer().getItemCooldownManager().isCoolingDown(offhandItem)
+                && mod.getClientBaritone().getPathingBehavior().isSafeToCancel();
+
+        if (shouldShield) {
+            LookHelper.lookAt(mod, entity.getEyePos());
+            ItemStack shieldSlot = StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT);
+
+            if (shieldSlot.getItem() != Items.SHIELD) {
+                mod.getSlotHandler().forceEquipItemToOffhand(Items.SHIELD);
+            } else if (!WorldHelper.isSurroundedByHostiles()) {
+                startShielding(mod);
+            }
+        }
+
+        performDelayedAttack(mod);
         // Run force field on map
         switch (mod.getModSettings().getForceFieldStrategy()) {
             case FASTEST:
@@ -196,44 +223,60 @@ public class KillAura {
 
     public void startShielding(AltoClef mod) {
         shielding = true;
+        InputControls input = mod.getInputControls();
+        SlotHandler slotHandler = mod.getSlotHandler();
+
+        // Pause all automated behaviors
         mod.getClientBaritone().getPathingBehavior().requestPause();
         mod.getExtraBaritoneSettings().setInteractionPaused(true);
+
+        // Handle player holding food instead of shield
         if (!mod.getPlayer().isBlocking()) {
-            ItemStack handItem = StorageHelper.getItemStackInSlot(PlayerSlot.getEquipSlot());
-            if (ItemVer.isFood(handItem)) {
-                List<ItemStack> spaceSlots = mod.getItemStorage().getItemStacksPlayerInventory(false);
-                if (!spaceSlots.isEmpty()) {
-                    for (ItemStack spaceSlot : spaceSlots) {
-                        if (spaceSlot.isEmpty()) {
-                            mod.getSlotHandler().clickSlot(PlayerSlot.getEquipSlot(), 0, SlotActionType.QUICK_MOVE);
-                            return;
-                        }
-                    }
+            ItemStack equipped = StorageHelper.getItemStackInSlot(PlayerSlot.getEquipSlot());
+
+            if (ItemVer.isFood(equipped)) {
+                // Try to find an empty slot first
+                Optional<ItemStack> emptySlot = mod.getItemStorage().getItemStacksPlayerInventory(false)
+                        .stream()
+                        .filter(ItemStack::isEmpty)
+                        .findFirst();
+
+                if (emptySlot.isPresent()) {
+                    slotHandler.clickSlot(PlayerSlot.getEquipSlot(), 0, SlotActionType.QUICK_MOVE);
+                } else {
+                    // Otherwise move food to garbage slot if available
+                    StorageHelper.getGarbageSlot(mod)
+                            .ifPresent(slot -> slotHandler.forceEquipItem(StorageHelper.getItemStackInSlot(slot).getItem()));
                 }
-                Optional<Slot> garbage = StorageHelper.getGarbageSlot(mod);
-                garbage.ifPresent(slot -> mod.getSlotHandler().forceEquipItem(StorageHelper.getItemStackInSlot(slot).getItem()));
             }
         }
-        mod.getInputControls().hold(Input.SNEAK);
-        mod.getInputControls().hold(Input.CLICK_RIGHT);
+
+        // Begin shielding inputs
+        input.hold(Input.SNEAK);
+        input.hold(Input.CLICK_RIGHT);
     }
 
     public void stopShielding(AltoClef mod) {
-        if (shielding) {
-            ItemStack cursor = StorageHelper.getItemStackInCursorSlot();
-            if (ItemVer.isFood(cursor)) {
-                Optional<Slot> toMoveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false).or(() -> StorageHelper.getGarbageSlot(mod));
-                if (toMoveTo.isPresent()) {
-                    Slot garbageSlot = toMoveTo.get();
-                    mod.getSlotHandler().clickSlot(garbageSlot, 0, SlotActionType.PICKUP);
-                }
-            }
-            mod.getInputControls().release(Input.SNEAK);
-            mod.getInputControls().release(Input.CLICK_RIGHT);
-            mod.getInputControls().release(Input.JUMP);
-            mod.getExtraBaritoneSettings().setInteractionPaused(false);
-            shielding = false;
+        if (!shielding) return;
+
+        InputControls input = mod.getInputControls();
+        ItemStack cursorItem = StorageHelper.getItemStackInCursorSlot();
+
+        // If cursor holds food, stash it or discard
+        if (ItemVer.isFood(cursorItem)) {
+            Optional<Slot> targetSlot = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursorItem, false)
+                    .or(() -> StorageHelper.getGarbageSlot(mod));
+
+            targetSlot.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, SlotActionType.PICKUP));
         }
+
+        // Release all held inputs and resume automation
+        input.release(Input.SNEAK);
+        input.release(Input.CLICK_RIGHT);
+        input.release(Input.JUMP);
+
+        mod.getExtraBaritoneSettings().setInteractionPaused(false);
+        shielding = false;
     }
 
     public boolean isShielding() {
