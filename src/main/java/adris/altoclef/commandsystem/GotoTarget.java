@@ -2,9 +2,6 @@ package adris.altoclef.commandsystem;
 
 import adris.altoclef.util.Dimension;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GotoTarget {
     private final int x;
     private final int y;

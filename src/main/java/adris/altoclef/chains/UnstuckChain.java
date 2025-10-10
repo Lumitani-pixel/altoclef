@@ -60,7 +60,7 @@ public class UnstuckChain extends SingleTaskChain {
             return;
         }
 
-        Vec3d pos1 = posHistory.get(0);
+        Vec3d pos1 = posHistory.getFirst();
         for (int i = 1; i < 100; i++) {
             Vec3d pos2 = posHistory.get(i);
             if (Math.abs(pos1.getX() - pos2.getX()) > 0.75 || Math.abs(pos1.getZ() - pos2.getZ()) > 0.75) {

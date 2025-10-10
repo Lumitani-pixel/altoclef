@@ -65,14 +65,10 @@ public class ProjectileProtectionWallTask extends Task implements ITaskRequiresG
 			return null;
 		}
 
-		Optional<Entity> sentity = mod.getEntityTracker().getClosestEntity((e) -> {
-        	if(e instanceof SkeletonEntity 
-        			&& EntityHelper.isAngryAtPlayer(mod, e)
-        			&& 
-        			(((SkeletonEntity) e).getItemUseTime() > 8)
-        			) return true;
-        	return false;
-        }, SkeletonEntity.class);
+		Optional<Entity> sentity = mod.getEntityTracker().getClosestEntity((e) -> e instanceof SkeletonEntity
+                && EntityHelper.isAngryAtPlayer(mod, e)
+                &&
+                (((SkeletonEntity) e).getItemUseTime() > 8), SkeletonEntity.class);
         if(sentity.isPresent()) {
     		Vec3d playerPos = mod.getPlayer().getPos();
             Vec3d targetPos = sentity.get().getPos();
@@ -101,14 +97,10 @@ public class ProjectileProtectionWallTask extends Task implements ITaskRequiresG
     public boolean isFinished() {
         assert MinecraftClient.getInstance().world != null;
         
-        Optional<Entity> entity = mod.getEntityTracker().getClosestEntity((e) -> {
-        	if(e instanceof SkeletonEntity 
-        			&& EntityHelper.isAngryAtPlayer(mod, e)
-        			&& 
-        			(((SkeletonEntity) e).getItemUseTime() > 3)
-        			) return true;
-        	return false;
-        }, SkeletonEntity.class);
+        Optional<Entity> entity = mod.getEntityTracker().getClosestEntity((e) -> e instanceof SkeletonEntity
+                && EntityHelper.isAngryAtPlayer(mod, e)
+                &&
+                (((SkeletonEntity) e).getItemUseTime() > 3), SkeletonEntity.class);
         
         return targetPlacePos != null && WorldHelper.isSolidBlock(targetPlacePos) || entity.isEmpty();
     }

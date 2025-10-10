@@ -129,10 +129,7 @@ public class MobDefenseChain extends SingleTaskChain {
             ItemStack cursor = StorageHelper.getItemStackInCursorSlot();
             if (ItemVer.isFood(cursor)) {
                 Optional<Slot> toMoveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false).or(() -> StorageHelper.getGarbageSlot(mod));
-                if (toMoveTo.isPresent()) {
-                    Slot garbageSlot = toMoveTo.get();
-                    mod.getSlotHandler().clickSlot(garbageSlot, 0, SlotActionType.PICKUP);
-                }
+                toMoveTo.ifPresent(garbageSlot -> mod.getSlotHandler().clickSlot(garbageSlot, 0, SlotActionType.PICKUP));
             }
             mod.getInputControls().release(Input.SNEAK);
             mod.getInputControls().release(Input.CLICK_RIGHT);
@@ -336,7 +333,7 @@ public class MobDefenseChain extends SingleTaskChain {
 
                     // We can deal with it.
                     runAwayTask = null;
-                    Entity toKill = toDealWithList.get(0);
+                    Entity toKill = toDealWithList.getFirst();
                     lockedOnEntity = toKill;
 
                     setTask(new KillEntitiesTask(toKill.getClass()));

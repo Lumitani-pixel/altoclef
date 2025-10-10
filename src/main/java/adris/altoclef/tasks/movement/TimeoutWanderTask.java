@@ -214,8 +214,7 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
                 }
             }
             case OVERWORLD, NETHER -> {
-                if (timer.getDuration() >= 30) {
-                }
+                if (timer.getDuration() >= 30) {}
                 if (timer.elapsed()) {
                     timer.reset();
                 }

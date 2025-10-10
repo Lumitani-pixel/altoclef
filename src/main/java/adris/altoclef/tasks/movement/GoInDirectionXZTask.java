@@ -35,8 +35,7 @@ public class GoInDirectionXZTask extends CustomBaritoneGoalTask {
 
     @Override
     protected boolean isEqual(Task other) {
-        if (other instanceof GoInDirectionXZTask) {
-            GoInDirectionXZTask task = (GoInDirectionXZTask) other;
+        if (other instanceof GoInDirectionXZTask task) {
             return (closeEnough(task._origin, _origin) && closeEnough(task._delta, _delta));
         }
         return false;

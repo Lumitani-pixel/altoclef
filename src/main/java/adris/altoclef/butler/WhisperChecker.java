@@ -5,8 +5,6 @@ import adris.altoclef.Debug;
 import adris.altoclef.util.time.TimerGame;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class WhisperChecker {
 
@@ -28,26 +26,27 @@ public class WhisperChecker {
             String part = parts.get(i);
             if (messageParts.isEmpty()) return null;
 
-            if (part.equals("{from}")) {
-                result.from = messageParts.remove(0);
-            } else if (part.equals("{to}")) {
-                String toUser = messageParts.remove(0);
-                if (!toUser.equals(ourUsername)) {
-                    Debug.logInternal("Rejected message since it is sent to " + toUser + " and not " + ourUsername);
-                    return null;
+            switch (part) {
+                case "{from}" -> result.from = messageParts.removeFirst();
+                case "{to}" -> {
+                    String toUser = messageParts.removeFirst();
+                    if (!toUser.equals(ourUsername)) {
+                        Debug.logInternal("Rejected message since it is sent to " + toUser + " and not " + ourUsername);
+                        return null;
+                    }
                 }
-            } else if (part.equals("{message}")) {
-                List<String> messageList = messageParts.subList(0,messageParts.size()-(parts.size()-i-1));
+                case "{message}" -> {
+                    List<String> messageList = messageParts.subList(0, messageParts.size() - (parts.size() - i - 1));
 
-                StringBuilder msg = new StringBuilder(messageList.get(0));
+                    StringBuilder msg = new StringBuilder(messageList.getFirst());
 
-                for (int j = 1; j < messageList.size(); j++) {
-                    msg.append(" ").append(messageList.get(j));
+                    for (int j = 1; j < messageList.size(); j++) {
+                        msg.append(" ").append(messageList.get(j));
+                    }
+
+                    result.message = msg.toString();
                 }
-
-                result.message = msg.toString();
-            } else {
-                throw new IllegalArgumentException("Unknown part: "+part);
+                default -> throw new IllegalArgumentException("Unknown part: " + part);
             }
 
         }

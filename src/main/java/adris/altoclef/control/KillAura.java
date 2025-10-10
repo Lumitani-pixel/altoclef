@@ -4,7 +4,6 @@ import adris.altoclef.AltoClef;
 import adris.altoclef.chains.MLGBucketFallChain;
 import adris.altoclef.multiversion.versionedfields.Entities;
 import adris.altoclef.multiversion.item.ItemVer;
-import adris.altoclef.tasks.FastNetherPortalTask;
 import adris.altoclef.trackers.storage.ItemStorageTracker;
 import adris.altoclef.util.helpers.LookHelper;
 import adris.altoclef.util.helpers.StlHelper;
@@ -13,7 +12,6 @@ import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.slots.PlayerSlot;
 import adris.altoclef.util.slots.Slot;
 import baritone.api.utils.input.Input;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.mob.CreeperEntity;
@@ -80,7 +78,7 @@ public class KillAura {
 
     public void tickEnd(AltoClef mod) {
         Optional<Entity> entities = targets.stream().min(StlHelper.compareValues(entity -> entity.squaredDistanceTo(mod.getPlayer())));
-        if (!entities.isPresent()) {
+        if (entities.isEmpty()) {
             stopShielding(mod);
             return;
         }

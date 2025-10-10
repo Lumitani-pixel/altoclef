@@ -311,11 +311,6 @@ public class FoodChain extends SingleTaskChain {
         return new Pair<>(foodTotal, Optional.ofNullable(bestFood));
     }
 
-    // If we need to eat like, NOW.
-    public boolean needsToEatCritical() {
-        return false;
-    }
-
     public boolean hasFood() {
         return hasFood;
     }

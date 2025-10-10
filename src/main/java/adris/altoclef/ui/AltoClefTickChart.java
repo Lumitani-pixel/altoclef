@@ -41,7 +41,7 @@ public class AltoClefTickChart {
 
 
         while (list.size() >= width-1) {
-            list.remove(0);
+            list.removeFirst();
         }
 
         for (int i = 0; i < list.size(); ++i) {

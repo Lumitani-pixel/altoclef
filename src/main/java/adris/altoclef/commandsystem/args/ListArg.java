@@ -6,7 +6,6 @@ import adris.altoclef.commandsystem.StringReader;
 import adris.altoclef.commandsystem.exception.CommandNotFinishedException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;

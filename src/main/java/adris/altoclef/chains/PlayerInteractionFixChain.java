@@ -107,7 +107,7 @@ public class PlayerInteractionFixChain extends TaskChain {
         ItemStack currentStack = StorageHelper.getItemStackInCursorSlot();
 
         if (currentStack != null && !currentStack.isEmpty()) {
-            //noinspection PointlessNullCheck
+            //noinspection Pointless NullCheck
             if (lastHandStack == null || !ItemStack.areEqual(currentStack, lastHandStack)) {
                 // We're holding a new item in our stack!
                 stackHeldTimeout.reset();

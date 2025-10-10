@@ -77,9 +77,7 @@ public class CraftGenericWithRecipeBooksTask extends Task implements ITaskUsesCr
                 }
                 // Find the garbage slot and click it to move the item there
                 garbage = StorageHelper.getGarbageSlot(mod);
-                if (garbage.isPresent()) {
-                    mod.getSlotHandler().clickSlot(garbage.get(), 0, SlotActionType.PICKUP);
-                }
+                garbage.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, SlotActionType.PICKUP));
                 // Click an undefined slot to clear the cursor stack
                 mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, SlotActionType.PICKUP);
             } else {

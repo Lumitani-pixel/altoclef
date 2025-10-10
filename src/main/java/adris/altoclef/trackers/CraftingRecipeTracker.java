@@ -48,7 +48,7 @@ public class CraftingRecipeTracker extends Tracker{
             return null;
         }
 
-        return itemRecipeMap.get(item).get(0);
+        return itemRecipeMap.get(item).getFirst();
     }
 
     public List<RecipeTarget> getRecipeTarget(Item item, int targetCount) {

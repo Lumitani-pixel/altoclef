@@ -14,7 +14,6 @@ import java.util.Set;
 /**
  * Searches/explores a continuous "blob" of chunks, attempting to load in ALL nearby chunks
  * that are part of this "blob" (e.g., biome, structure, etc.)
- *
  * The subclass must define isChunkWithinSearchSpace to decide which chunks belong.
  */
 public abstract class SearchChunksExploreTask extends Task {

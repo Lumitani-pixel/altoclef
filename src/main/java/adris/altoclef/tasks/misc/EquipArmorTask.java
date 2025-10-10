@@ -162,7 +162,7 @@ public class EquipArmorTask extends Task {
     }
 
     public boolean armorEquipped() {
-        return armorTestAll(item -> StorageHelper.isArmorEquipped(item));
+        return armorTestAll(StorageHelper::isArmorEquipped);
     }
 
 }

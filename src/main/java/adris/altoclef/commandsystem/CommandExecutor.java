@@ -102,7 +102,7 @@ public class CommandExecutor {
 
     private Command getCommand(String line) throws RuntimeCommandException {
         line = line.trim();
-        if (line.length() != 0) {
+        if (!line.isEmpty()) {
             String command = line;
             int firstSpace = line.indexOf(' ');
             if (firstSpace != -1) {

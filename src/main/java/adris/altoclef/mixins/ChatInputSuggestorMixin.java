@@ -9,7 +9,6 @@ import adris.altoclef.commandsystem.args.ListArg;
 import adris.altoclef.commandsystem.exception.BadCommandSyntaxException;
 import adris.altoclef.commandsystem.exception.CommandException;
 import adris.altoclef.commandsystem.exception.CommandNotFinishedException;
-import adris.altoclef.commandsystem.exception.RuntimeCommandException;
 import adris.altoclef.util.Pair;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;

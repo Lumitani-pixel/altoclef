@@ -1565,7 +1565,7 @@ public class BeatMinecraftTask extends Task {
                 setDebugState("Sleeping through night");
                 return sleepThroughNightTask;
             }
-            if (!itemStorage.hasItem(ItemHelper.BED) && (mod.getBlockScanner().anyFound(blockPos -> WorldHelper.canBreak(blockPos), ItemHelper.itemsToBlocks(ItemHelper.BED)) || isTaskRunning(mod, getOneBedTask))) {
+            if (!itemStorage.hasItem(ItemHelper.BED) && (mod.getBlockScanner().anyFound(WorldHelper::canBreak, ItemHelper.itemsToBlocks(ItemHelper.BED)) || isTaskRunning(mod, getOneBedTask))) {
                 setDebugState("Getting one bed to sleep in at night.");
                 return getOneBedTask;
             }
@@ -2126,7 +2126,7 @@ public class BeatMinecraftTask extends Task {
                         return lastTask;
                     }
                     if (!sameTask) {
-                        taskChanges.add(0, new TaskChange(lastGather, toGather, mod.getPlayer().getBlockPos()));
+                        taskChanges.addFirst(new TaskChange(lastGather, toGather, mod.getPlayer().getBlockPos()));
                     }
 
                     if (taskChanges.size() >= 3 && !sameTask) {
@@ -2141,7 +2141,7 @@ public class BeatMinecraftTask extends Task {
                             return lastTask;
                         }
                         if (taskChanges.size() > 3) {
-                            taskChanges.remove(taskChanges.size() - 1);
+                            taskChanges.removeLast();
                         }
                     }
 

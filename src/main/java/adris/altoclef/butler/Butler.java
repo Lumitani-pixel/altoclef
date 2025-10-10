@@ -6,9 +6,7 @@ import adris.altoclef.eventbus.EventBus;
 import adris.altoclef.eventbus.events.ChatMessageEvent;
 import adris.altoclef.eventbus.events.TaskFinishedEvent;
 import adris.altoclef.ui.MessagePriority;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.message.MessageType;
-import net.minecraft.world.World;
 
 import java.util.Objects;
 

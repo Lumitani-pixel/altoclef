@@ -21,12 +21,9 @@ import adris.altoclef.tasks.resources.CollectFoodTask;
 import adris.altoclef.tasks.resources.TradeWithPiglinsTask;
 import adris.altoclef.tasks.speedrun.KillEnderDragonTask;
 import adris.altoclef.tasks.speedrun.KillEnderDragonWithBedsTask;
-import adris.altoclef.tasks.speedrun.WaitForDragonAndPearlTask;
 import adris.altoclef.util.*;
 import adris.altoclef.util.helpers.WorldHelper;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.GhastEntity;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -35,13 +32,10 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.chunk.EmptyChunk;
 
 import java.io.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
 
 /**
  * For testing.
@@ -191,10 +185,10 @@ public class Playground {
                 break;
             case "kill":
                 List<ZombieEntity> zombs = mod.getEntityTracker().getTrackedEntities(ZombieEntity.class);
-                if (zombs.size() == 0) {
+                if (zombs.isEmpty()) {
                     Debug.logWarning("No zombs found.");
                 } else {
-                    LivingEntity entity = zombs.get(0);
+                    LivingEntity entity = zombs.getFirst();
                     mod.runUserTask(new KillEntityTask(entity));
                 }
                 break;
@@ -305,12 +299,12 @@ public class Playground {
 
                 List<GhastEntity> ghasts = mod.getEntityTracker().getTrackedEntities(GhastEntity.class);
 
-                if (ghasts.size() == 0) {
+                if (ghasts.isEmpty()) {
                     Debug.logWarning("No ghasts found.");
                     break;
                 }
 
-                GhastEntity ghast = ghasts.get(0);
+                GhastEntity ghast = ghasts.getFirst();
                 mod.runUserTask(new ShootArrowSimpleProjectileTask(ghast));
                 break;
             default:

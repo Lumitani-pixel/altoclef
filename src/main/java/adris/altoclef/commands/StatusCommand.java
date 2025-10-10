@@ -18,7 +18,7 @@ public class StatusCommand extends Command {
         if (tasks.isEmpty()) {
             mod.log("No tasks currently running.");
         } else {
-            mod.log("CURRENT TASK: " + tasks.get(0).toString());
+            mod.log("CURRENT TASK: " + tasks.getFirst().toString());
         }
         finish();
     }

@@ -200,7 +200,7 @@ public class EscapeFromLavaTask extends CustomBaritoneGoalTask {
                 .raycast(
                         new RaycastContext(
                                 cameraPos, vec3d3, RaycastContext.ShapeType.OUTLINE,
-                                false ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, mod.getPlayer()
+                                RaycastContext.FluidHandling.NONE, mod.getPlayer()
                         )
                 );
     }
@@ -211,7 +211,7 @@ public class EscapeFromLavaTask extends CustomBaritoneGoalTask {
         float i = MathHelper.sin(g);
         float j = MathHelper.cos(f);
         float k = MathHelper.sin(f);
-        return new Vec3d((double)(i * j), (double)(-k), (double)(h * j));
+        return new Vec3d((i * j), (-k), (h * j));
     }
 
 

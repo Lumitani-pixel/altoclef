@@ -5,7 +5,6 @@ import adris.altoclef.Debug;
 import adris.altoclef.eventbus.EventBus;
 import adris.altoclef.eventbus.events.ChunkLoadEvent;
 import adris.altoclef.eventbus.events.ChunkUnloadEvent;
-import adris.altoclef.util.helpers.WorldHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.EmptyChunk;
