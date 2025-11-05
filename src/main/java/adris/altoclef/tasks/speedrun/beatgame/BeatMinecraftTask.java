@@ -33,6 +33,7 @@ import adris.altoclef.util.time.TimerGame;
 import baritone.api.utils.input.Input;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.EndPortalFrameBlock;
 import net.minecraft.client.gui.screen.CreditsScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -1895,23 +1896,31 @@ public class BeatMinecraftTask extends Task {
      * @return The position of the end portal frame, or null if not enough frames are found.
      */
 
-    // FIXME note that this doesnt work correctly and only returns a postion that is WITHIN the end portal, not its center -MiranCZ
     private BlockPos doSimpleSearchForEndPortal(AltoClef mod) {
         List<BlockPos> frames = mod.getBlockScanner().getKnownLocations(Blocks.END_PORTAL_FRAME);
 
         if (frames.size() >= END_PORTAL_FRAME_COUNT) {
-            // Calculate the average position of the frames.
-            Vec3d average = frames.stream().reduce(Vec3d.ZERO, (accum, bpos) -> accum.add((int) Math.round(bpos.getX() + 0.5), (int) Math.round(bpos.getY() + 0.5), (int) Math.round(bpos.getZ() + 0.5)), Vec3d::add).multiply(1d / frames.size());
+            int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+            int maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+            int yLevel = frames.getFirst().getY();
 
-            // Log the average position.
-            mod.log("Average Position: " + average);
+            for (BlockPos pos : frames) {
+                minX = Math.min(minX, pos.getX());
+                minZ = Math.min(minZ, pos.getZ());
+                maxX = Math.max(maxX, pos.getX());
+                maxZ = Math.max(maxZ, pos.getZ());
+            }
 
-            return new BlockPos(new Vec3i((int) average.x, (int) average.y, (int) average.z));
+            double centerX = (minX + maxX) / 2.0;
+            double centerZ = (minZ + maxZ) / 2.0;
+
+            BlockPos center = new BlockPos((int) centerX, yLevel, (int) centerZ);
+            mod.log("End Portal center estimated at: " + center);
+
+            return center;
         }
 
-        // Log that there are not enough frames.
-        Debug.logInternal("Not enough frames");
-
+        Debug.logInternal("Not enough frames found for end portal detection.");
         return null;
     }
 

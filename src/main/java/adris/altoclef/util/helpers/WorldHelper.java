@@ -2,6 +2,7 @@ package adris.altoclef.util.helpers;
 
 import adris.altoclef.AltoClef;
 import adris.altoclef.mixins.ClientConnectionAccessor;
+import adris.altoclef.multiversion.BlockTagVer;
 import adris.altoclef.multiversion.MethodWrapper;
 import adris.altoclef.multiversion.world.WorldVer;
 import adris.altoclef.util.Dimension;
@@ -21,6 +22,9 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.registry.tag.BiomeTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -271,14 +275,19 @@ public interface WorldHelper {
         for (int dy = 1; dy <= toBreak.getY() - altoClef.getWorld().getBottomY(); ++dy) {
             BlockPos check = toBreak.down(dy);
             BlockState s = altoClef.getWorld().getBlockState(check);
+            BlockPos nextYBlock = check.down();
             boolean tooFarToFall = dy > altoClef.getClientBaritoneSettings().maxFallHeightNoWater.value;
             // Don't fall in lava
             if (MovementHelper.isLava(s))
                 return true;
-            // Always fall in water
-            // TODO: If there's a 1 meter thick layer of water and then a massive drop below, the bot will think it is safe.
-            if (MovementHelper.isWater(s))
+            // Fall in water when safe
+            if (MovementHelper.isWater(s)){
+                while (nextYBlock.getY()>-62) {
+                    if(isSolidBlock(nextYBlock)) return false;
+                    nextYBlock = nextYBlock.down();
+                }
                 return true;
+            }
             // We hit ground, depends
             if (WorldHelper.isSolidBlock(check)) {
                 return tooFarToFall;
@@ -314,15 +323,7 @@ public interface WorldHelper {
     //#else
     //$$ static boolean isOcean(Biome b) {
     //#endif
-        return (WorldVer.isBiome(b,BiomeKeys.OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.COLD_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.DEEP_COLD_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.DEEP_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.DEEP_FROZEN_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.DEEP_LUKEWARM_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.LUKEWARM_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.WARM_OCEAN)
-                || WorldVer.isBiome(b,BiomeKeys.FROZEN_OCEAN));
+        return b.isIn(BiomeTags.IS_OCEAN);
     }
 
     static boolean isAir(BlockPos pos) {
@@ -331,7 +332,7 @@ public interface WorldHelper {
     }
 
     static boolean isAir(Block block) {
-        return block == Blocks.AIR || block == Blocks.CAVE_AIR || block == Blocks.VOID_AIR;
+        return block.getDefaultState().isAir();
     }
 
     static boolean isInteractableBlock(BlockPos pos) {
