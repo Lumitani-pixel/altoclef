@@ -213,7 +213,7 @@ public class BeatMinecraftTask extends Task {
         gatherResources.add(new ActionPriorityTask(a -> {
             Pair<Task, Double> pair = new Pair<>(TaskCatalogue.getItemTask(Items.WATER_BUCKET, 1), Double.NEGATIVE_INFINITY);
 
-            if (itemStorage.hasItem(Items.WATER_BUCKET) || hasItem(mod, Items.WATER_BUCKET))
+            if (itemStorage.hasItem(Items.WATER_BUCKET) || ItemHelper.hasItem(mod, Items.WATER_BUCKET))
                 return pair;
 
             Optional<BlockPos> optionalPos = mod.getBlockScanner().getNearestBlock(Blocks.WATER);
@@ -353,67 +353,6 @@ public class BeatMinecraftTask extends Task {
         }
     }
 
-    public static boolean hasItem(AltoClef mod, Item item) {
-        ClientPlayerEntity player = mod.getPlayer();
-        PlayerInventory inv = player.getInventory();
-        List<DefaultedList<ItemStack>> combinedInventory = List.of(inv.main, inv.armor, inv.offHand);
-
-        for (List<ItemStack> list : combinedInventory) {
-            for (ItemStack itemStack : list) {
-                if (itemStack.getItem().equals(item)) return true;
-            }
-        }
-
-        return false;
-    }
-
-    //TODO move to ItemHelper
-    public static int getCountWithCraftedFromOre(AltoClef mod, Item item) {
-        ItemStorageTracker itemStorage = mod.getItemStorage();
-
-        if (item == Items.COAL) {
-            return itemStorage.getItemCount(item);
-        } else if (item == Items.RAW_IRON) {
-            int count = itemStorage.getItemCount(Items.RAW_IRON, Items.IRON_INGOT);
-            count += itemStorage.getItemCount(Items.BUCKET, Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.AXOLOTL_BUCKET, Items.POWDER_SNOW_BUCKET) * 3;
-            count += hasItem(mod, Items.SHIELD) ? 1 : 0;
-            count += hasItem(mod, Items.FLINT_AND_STEEL) ? 1 : 0;
-
-            count += hasItem(mod, Items.IRON_SWORD) ? 2 : 0;
-            count += hasItem(mod, Items.IRON_PICKAXE) ? 3 : 0;
-
-            count += hasItem(mod, Items.IRON_HELMET) ? 5 : 0;
-            count += hasItem(mod, Items.IRON_CHESTPLATE) ? 8 : 0;
-            count += hasItem(mod, Items.IRON_LEGGINGS) ? 7 : 0;
-            count += hasItem(mod, Items.IRON_BOOTS) ? 4 : 0;
-
-            return count;
-        } else if (item == Items.RAW_GOLD) {
-            int count = itemStorage.getItemCount(Items.RAW_GOLD, Items.GOLD_INGOT);
-            count += hasItem(mod, Items.GOLDEN_PICKAXE) ? 3 : 0;
-
-            count += hasItem(mod, Items.GOLDEN_HELMET) ? 5 : 0;
-            count += hasItem(mod, Items.GOLDEN_CHESTPLATE) ? 8 : 0;
-            count += hasItem(mod, Items.GOLDEN_LEGGINGS) ? 7 : 0;
-            count += hasItem(mod, Items.GOLDEN_BOOTS) ? 4 : 0;
-
-            return count;
-        } else if (item == Items.DIAMOND) {
-            int count = itemStorage.getItemCount(Items.DIAMOND);
-            count += hasItem(mod, Items.DIAMOND_SWORD) ? 2 : 0;
-            count += hasItem(mod, Items.DIAMOND_PICKAXE) ? 3 : 0;
-
-            count += hasItem(mod, Items.DIAMOND_HELMET) ? 5 : 0;
-            count += hasItem(mod, Items.DIAMOND_CHESTPLATE) ? 8 : 0;
-            count += hasItem(mod, Items.DIAMOND_LEGGINGS) ? 7 : 0;
-            count += hasItem(mod, Items.DIAMOND_BOOTS) ? 4 : 0;
-
-            return count;
-        }
-
-        throw new IllegalStateException("Invalid ore item: " + item);
-    }
-
     private static Block[] mapOreItemToBlocks(Item item) {
         if (item.equals(Items.RAW_IRON)) {
             return new Block[]{Blocks.DEEPSLATE_IRON_ORE, Blocks.IRON_ORE};
@@ -538,7 +477,7 @@ public class BeatMinecraftTask extends Task {
             if (itemStorage.hasItem(Items.FLINT_AND_STEEL)) {
                 neededIron--;
             }
-            if (hasItem(mod, Items.SHIELD)) {
+            if (ItemHelper.hasItem(mod, Items.SHIELD)) {
                 neededIron--;
             }
             if (hasSufficientPickaxe) {
@@ -551,7 +490,7 @@ public class BeatMinecraftTask extends Task {
             int count = itemStorage.getItemCount(Items.RAW_IRON);
             int includedCount = count + itemStorage.getItemCount(Items.IRON_INGOT);
 
-            if ((!hasSufficientPickaxe && includedCount >= 3) || (!hasItem(mod, Items.SHIELD) && includedCount >= 1) || includedCount >= neededIron) {
+            if ((!hasSufficientPickaxe && includedCount >= 3) || (!ItemHelper.hasItem(mod, Items.SHIELD) && includedCount >= 1) || includedCount >= neededIron) {
                 int toSmelt = Math.min(includedCount, neededIron);
                 if (toSmelt <= 0) return pair;
 
@@ -1340,7 +1279,7 @@ public class BeatMinecraftTask extends Task {
         if (WorldHelper.getCurrentDimension() == Dimension.NETHER) {
             if (itemStorage.hasItem(Items.GOLDEN_HELMET)) {
                 return new EquipArmorTask(Items.GOLDEN_HELMET);
-            } else if (itemStorage.hasItem(Items.DIAMOND_HELMET) && !hasItem(mod, Items.GOLDEN_HELMET)) {
+            } else if (itemStorage.hasItem(Items.DIAMOND_HELMET) && !ItemHelper.hasItem(mod, Items.GOLDEN_HELMET)) {
                 return new EquipArmorTask(Items.DIAMOND_HELMET);
             }
         } else {
@@ -2380,7 +2319,7 @@ public class BeatMinecraftTask extends Task {
 
         @Override
         public void update(int count) {
-            super.update(getCountWithCraftedFromOre(mod, oreItem));
+            super.update(ItemHelper.getCountWithCraftedFromOre(mod, oreItem));
         }
 
     }

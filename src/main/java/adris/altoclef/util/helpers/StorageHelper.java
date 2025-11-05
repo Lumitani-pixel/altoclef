@@ -28,6 +28,7 @@ import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.*;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -173,10 +174,10 @@ public class StorageHelper {
     }
 
     // if the iron pickaxes durability is low, we do not have diamond pickaxe and are not mining diamonds, do not use it
-    public static boolean shouldSaveStack(AltoClef mod,Block block, ItemStack stack) {
+    public static boolean shouldSaveStack(AltoClef mod, Block block, ItemStack stack) {
         if (!stack.getItem().equals(Items.IRON_PICKAXE) || mod.getItemStorage().hasItem(Items.DIAMOND_PICKAXE)) return false;
 
-        boolean diamondRelatedBlock = block.equals(Blocks.DIAMOND_BLOCK) || block.equals(Blocks.DIAMOND_ORE) || block.equals(Blocks.DEEPSLATE_DIAMOND_ORE);
+        boolean diamondRelatedBlock = block.equals(Blocks.DIAMOND_BLOCK) || block.getDefaultState().isIn(BlockTags.DIAMOND_ORES);
 
         // if the durability is really low, mine only diamond related stuff
         if (stack.getDamage()+8 > stack.getMaxDamage()) {

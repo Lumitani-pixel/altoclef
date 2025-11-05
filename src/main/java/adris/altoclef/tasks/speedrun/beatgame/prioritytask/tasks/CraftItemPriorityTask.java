@@ -8,6 +8,7 @@ import adris.altoclef.tasks.speedrun.beatgame.BeatMinecraftTask;
 import adris.altoclef.tasksystem.Task;
 import adris.altoclef.util.RecipeTarget;
 import adris.altoclef.util.helpers.CraftingHelper;
+import adris.altoclef.util.helpers.ItemHelper;
 
 import java.util.function.Function;
 
@@ -55,7 +56,7 @@ public class CraftItemPriorityTask extends PriorityTask{
 
     @Override
     protected double getPriority(AltoClef mod) {
-        if (BeatMinecraftTask.hasItem(mod, recipeTarget.getOutputItem())) {
+        if (ItemHelper.hasItem(mod, recipeTarget.getOutputItem())) {
             Debug.logInternal("THIS IS SATISFIED "+recipeTarget.getOutputItem());
             satisfied = true;
         }

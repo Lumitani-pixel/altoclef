@@ -5,15 +5,19 @@ import adris.altoclef.multiversion.BlockTagVer;
 import adris.altoclef.multiversion.item.ItemVer;
 import adris.altoclef.multiversion.versionedfields.Blocks;
 import adris.altoclef.multiversion.versionedfields.Items;
+import adris.altoclef.trackers.storage.ItemStorageTracker;
 import adris.altoclef.util.WoodType;
 import net.minecraft.block.Block;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.*;
 
@@ -430,6 +434,66 @@ public class ItemHelper {
 
     public boolean isRawFood(Item item) {
         return cookableFoodMap.containsKey(item);
+    }
+
+    public static boolean hasItem(AltoClef mod, Item item) {
+        ClientPlayerEntity player = mod.getPlayer();
+        PlayerInventory inv = player.getInventory();
+        List<DefaultedList<ItemStack>> combinedInventory = List.of(inv.main, inv.armor, inv.offHand);
+
+        for (List<ItemStack> list : combinedInventory) {
+            for (ItemStack itemStack : list) {
+                if (itemStack.getItem().equals(item)) return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static int getCountWithCraftedFromOre(AltoClef mod, Item item) {
+        ItemStorageTracker itemStorage = mod.getItemStorage();
+
+        if (item == Items.COAL) {
+            return itemStorage.getItemCount(item);
+        } else if (item == Items.RAW_IRON) {
+            int count = itemStorage.getItemCount(Items.RAW_IRON, Items.IRON_INGOT);
+            count += itemStorage.getItemCount(Items.BUCKET, Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.AXOLOTL_BUCKET, Items.POWDER_SNOW_BUCKET) * 3;
+            count += hasItem(mod, Items.SHIELD) ? 1 : 0;
+            count += hasItem(mod, Items.FLINT_AND_STEEL) ? 1 : 0;
+
+            count += hasItem(mod, Items.IRON_SWORD) ? 2 : 0;
+            count += hasItem(mod, Items.IRON_PICKAXE) ? 3 : 0;
+
+            count += hasItem(mod, Items.IRON_HELMET) ? 5 : 0;
+            count += hasItem(mod, Items.IRON_CHESTPLATE) ? 8 : 0;
+            count += hasItem(mod, Items.IRON_LEGGINGS) ? 7 : 0;
+            count += hasItem(mod, Items.IRON_BOOTS) ? 4 : 0;
+
+            return count;
+        } else if (item == Items.RAW_GOLD) {
+            int count = itemStorage.getItemCount(Items.RAW_GOLD, Items.GOLD_INGOT);
+            count += hasItem(mod, Items.GOLDEN_PICKAXE) ? 3 : 0;
+
+            count += hasItem(mod, Items.GOLDEN_HELMET) ? 5 : 0;
+            count += hasItem(mod, Items.GOLDEN_CHESTPLATE) ? 8 : 0;
+            count += hasItem(mod, Items.GOLDEN_LEGGINGS) ? 7 : 0;
+            count += hasItem(mod, Items.GOLDEN_BOOTS) ? 4 : 0;
+
+            return count;
+        } else if (item == Items.DIAMOND) {
+            int count = itemStorage.getItemCount(Items.DIAMOND);
+            count += hasItem(mod, Items.DIAMOND_SWORD) ? 2 : 0;
+            count += hasItem(mod, Items.DIAMOND_PICKAXE) ? 3 : 0;
+
+            count += hasItem(mod, Items.DIAMOND_HELMET) ? 5 : 0;
+            count += hasItem(mod, Items.DIAMOND_CHESTPLATE) ? 8 : 0;
+            count += hasItem(mod, Items.DIAMOND_LEGGINGS) ? 7 : 0;
+            count += hasItem(mod, Items.DIAMOND_BOOTS) ? 4 : 0;
+
+            return count;
+        }
+
+        throw new IllegalStateException("Invalid ore item: " + item);
     }
 
     public static class ColorfulItems {
