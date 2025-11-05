@@ -13,19 +13,17 @@
 A client side bot that tries to beat Minecraft on its own...
 
 **This fork is still under development and is nowhere near perfect, if you have any questions, suggestions, ideas or find a bug don't hesitate to reach out!
-You can use the [issues](https://github.com/MiranCZ/altoclef/issues). Or contact me on discord!**
+You can use the [issues](https://github.com/Lumitani-pixel/altoclef/issues). Or contact me on discord!**
 
 Became [the first bot to beat Minecraft fully autonomously](https://youtu.be/baAa6s8tahA) on May 24, 2021.
 
 **Join the [Discord Server](https://discord.gg/JdFP4Kqdqc)** for discussions/updates/goofs & gaffs
 
 ## About this fork
-This fork aims to improve AltoClef by fixing a lot of bugs and optimizing some things. The main focus is optimizing the `MarvionBeatMinecraftTask` (I will just refer to it as `BeatMinecraftTask`) from [Marvion's fork](https://github.com/MarvionKirito/altoclef).
-
-Because I rewrote a good portion of the `BeatMinecraftTask` a lot of the config settings don't work. Although I plan to implement configs in the future of course.  
+This fork aims to improve AltoClef by fixing a lot of bugs and optimizing some things. The main focus is optimizing the `BeatGameTask` (I will just refer to it as `BeatMinecraftTask`) from [MiranCZ's fork](https://github.com/MiranCZ/altoclef).  
 
 ## The preprocessor
-I am currently using the [replay mod preprocessor](https://github.com/ReplayMod/preprocessor) to keep the mod updated across multiple versions at the same time.
+MiranCZ used the [replay mod preprocessor](https://github.com/ReplayMod/preprocessor) to keep the mod updated across multiple versions at the same time.
 
 ### Versions
 Thanks to that, the mod is currently available on **fabric** for (basically) all versions between `1.21.1` and `1.16.5` (inclusive).
@@ -50,7 +48,7 @@ or this [Video explanation](https://youtu.be/q5OmcinQ2ck?t=387)
 configurations will interfere with altoclef and introduce bugs. This will be fixed in the future.
 
 
-Here is a list of links for download of the latest versions for convenience. 
+Here is a list of links for download of the latest versions for convenience (Currently pointing to MiranCZ's repo). 
 
 | Version | Fabric download link                                                                                          |
 |---------|---------------------------------------------------------------------------------------------------------------|
