@@ -8,11 +8,12 @@
     "TacoTechnica",
     "James Green",
     "Marvion Kirito",
-    "MiranCZ"
+    "MiranCZ",
+    "NormalV"
   ],
   "contact": {
-    "homepage": "https://github.com/MiranCZ/altoclef",
-    "sources": "https://github.com/MiranCZ/altoclef"
+    "homepage": "https://github.com/Lumitani-pixel/altoclef",
+    "sources": "https://github.com/Lumitani-pixel/altoclef"
   },
   "license": "MIT",
   "icon": "assets/altoclef/icon.png",
