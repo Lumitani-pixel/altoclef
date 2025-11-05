@@ -23,6 +23,7 @@ import adris.altoclef.tasks.speedrun.beatgame.prioritytask.prioritycalculators.D
 import adris.altoclef.tasks.speedrun.beatgame.prioritytask.prioritycalculators.StaticItemPriorityCalculator;
 import adris.altoclef.tasks.speedrun.beatgame.prioritytask.tasks.*;
 import adris.altoclef.tasksystem.Task;
+import adris.altoclef.trackers.CraftingRecipeTracker;
 import adris.altoclef.trackers.EntityTracker;
 import adris.altoclef.trackers.storage.ItemStorageTracker;
 import adris.altoclef.util.*;
@@ -392,17 +393,8 @@ public class BeatMinecraftTask extends Task {
         ));
     }
 
-    // FIXME again, this is stupid.. but without a rewrite I cant use CraftingRecipeTracker due to the fact some recipes arent catalogued :')
     private RecipeTarget getRecipeTarget(Item item) {
-        ResourceTask task = TaskCatalogue.getItemTask(item, 1);
-        if (task instanceof CraftInTableTask craftInTableTask) {
-            return craftInTableTask.getRecipeTargets()[0];
-        } else if (task instanceof CraftInInventoryTask craftInInventoryTask) {
-            return craftInInventoryTask.getRecipeTarget();
-        }
-
-        throw new IllegalStateException("Item isn't cataloged");
-        //  return mod.getCraftingRecipeTracker().getFirstRecipeTarget(item, 1);
+        return mod.getCraftingRecipeTracker().getRecipeTarget(item, 1).getFirst();
     }
 
     private void addPickupImportantItemsTask(AltoClef mod) {
